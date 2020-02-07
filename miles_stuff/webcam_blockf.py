@@ -45,12 +45,12 @@ def main():
             pts = np.float32([[0, 0], [0, h], [w, h], [w, 0]]).reshape(-1, 1, 2)
             if matrix is not None:
                 dst = cv2.perspectiveTransform(pts, matrix)
+                print(dst)
 
                 homography = cv2.polylines(frame, [np.int32(dst)], True, (255, 0, 0), cv2.LINE_AA)
 
                 cv2.imshow('frame', homography)
             else:
-                print("!!!!")
                 cv2.imshow('frame', frame)
 
         else:

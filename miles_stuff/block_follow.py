@@ -1,4 +1,6 @@
 import anki_vector as av 
+import numpy as np
+import cv2
 from anki_vector.util import degrees
 
 def main():
@@ -13,6 +15,18 @@ def main():
         robot.world.connect_cube()
         robot.behavior.say_text("initialization complete")
 
+        # tracking cube
+        robot.behavior.say_text("tracking cube")
+        cube_img = cv2.imread("block_pattern.jpg", cv2.IMREAD_GRAYSCALE)
+        
+        # using webcam to get track block (REPLACE THIS WITH ROBOT)
+        cv2.VideoCapture(0)  # 0 is webcam number or something
+        while(True):
+            ret, frame = cap.read()
+            grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            cv2.imshow('frame', grey)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
 
 if __name__ == "__main__":

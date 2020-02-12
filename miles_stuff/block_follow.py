@@ -19,6 +19,7 @@ def main():
         query_pts = np.float32([kp_cubeimg[m.queryIdx].pt for m in good_points]).reshape(-1, 1, 2)
         train_pts = np.float32([kp_grey[m.trainIdx].pt for m in good_points]).reshape(-1, 1, 2)
 
+        dst = None
         # compare key points
         if len(good_points) >= 4:
             matrix, mask = cv2.findHomography(query_pts, train_pts, cv2.RANSAC, 5.0)
@@ -30,27 +31,56 @@ def main():
             if matrix is not None:
                 dst = cv2.perspectiveTransform(pts, matrix)
                 cd1 = (dst[0][0][0], dst[0][0][1])
-                cd2 = (dst[1][0][0], dst[1][0][1])
-                cd3 = (dst[2][0][0], dst[2][0][1])
-                cd4 = (dst[3][0][0], dst[3][0][1])
+                # cd2 = (dst[1][0][0], dst[1][0][1])
+                # cd3 = (dst[2][0][0], dst[2][0][1])
+                # cd4 = (dst[3][0][0], dst[3][0][1])
 
                 # homography = cv2.polylines(grey, [np.int32(dst)], True, (255, 0, 0), cv2.LINE_AA)
                 cv2.circle(grey, cd1, 5, (0, 255, 0), -1)
-                cv2.circle(grey, cd2, 5, (0, 0, 255), -1)
-                cv2.circle(grey, cd3, 5, (0, 255, 255), -1)
-                cv2.circle(grey, cd4, 5, (255, 255, 0), -1)
-                cv2.imshow('frame', grey)
-                # use dst_tup to find where cube face is on screen       
+                # cv2.circle(grey, cd2, 5, (0, 0, 255), -1)
+                # cv2.circle(grey, cd3, 5, (0, 255, 255), -1)
+                # cv2.circle(grey, cd4, 5, (255, 255, 0), -1)
+                cv2.imshow('frame', grey)       
                 
             else:
                 cv2.imshow('frame', grey)
-                print("else1")
+                # print("else1")
         else:
             cv2.imshow('frame', grey)
-            print("else2")
+            # print("else2")
         
         cv2.waitKey(1)
-        return "sdfadf"  # dst_tup is the top right (?) corner of cube position
+        return dst  # dst_tup is the top right (?) corner of cube position
+
+    def calculateDistance(dst_matrix, frame):
+        # corners of square
+        cd1 = (dst_matrix[0][0][0], dst_matrix[0][0][1])
+        cd2 = (dst_matrix[1][0][0], dst_matrix[1][0][1])
+        cd3 = (dst_matrix[2][0][0], dst_matrix[2][0][1])
+        cd4 = (dst_matrix[3][0][0], dst_matrix[3][0][1])
+
+        # if it is to the left or right
+        w_sum = 0
+        h_sum = 0
+        h_list = []
+        for i in range(4):
+            h_list.append(dst_matrix[i][0][1])
+            w_sum += dst_matrix[i][0][0]
+            h_sum += h_list[i]
+
+        centre = (w_sum/4, h_sum/4)
+
+        # how far away it is
+        h_list.sort() # smallest to largest
+
+        h_len = 0.5*(h_list[3] + h_list[2]) - 0.5*(h_list[1] + h_list[0])
+        h_frame, _, _ = frame.shape
+
+        coef = 1
+        d_from_cube = coef*abs(h_frame - h_len)
+        print(d_from_cube)
+
+        
 
 
     ANKI_SERIAL = '00804458'
@@ -86,6 +116,8 @@ def main():
             frame_cv2 = np.array(raw_img)
 
             pos = findCube(frame_cv2)
+            if pos is not None:
+                calculateDistance(pos, frame_cv2)
 
 
 if __name__ == "__main__":

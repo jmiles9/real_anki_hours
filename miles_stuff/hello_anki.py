@@ -9,7 +9,7 @@ def main():
     with av.Robot(serial=ANKI_SERIAL,
                   behavior_control_level=ANKI_BEHAVIOR) as robot:
         print("Say 'Hello World'...")
-        robot.behavior.say_text("hello hello hello")
+        robot.behavior.say_text("hello nick")
 
 
 if __name__ == "__main__":

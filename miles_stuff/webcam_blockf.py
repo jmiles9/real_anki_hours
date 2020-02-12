@@ -45,10 +45,16 @@ def main():
             pts = np.float32([[0, 0], [0, h], [w, h], [w, 0]]).reshape(-1, 1, 2)
             if matrix is not None:
                 dst = cv2.perspectiveTransform(pts, matrix)
-                print(dst)
+                cd1 = (dst[0][0][0], dst[0][0][1])
+                cd2 = (dst[1][0][0], dst[1][0][1])
+                cd3 = (dst[2][0][0], dst[2][0][1])
+                cd4 = (dst[3][0][0], dst[3][0][1])
 
                 homography = cv2.polylines(frame, [np.int32(dst)], True, (255, 0, 0), cv2.LINE_AA)
-
+                cv2.circle(homography, cd1, 5, (0, 255, 0), -1)
+                cv2.circle(homography, cd2, 5, (0, 0, 255), -1)
+                cv2.circle(homography, cd3, 5, (0, 255, 255), -1)
+                cv2.circle(homography, cd4, 5, (255, 255, 0), -1)
                 cv2.imshow('frame', homography)
             else:
                 cv2.imshow('frame', frame)

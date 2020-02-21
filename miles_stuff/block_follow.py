@@ -1,5 +1,9 @@
+#!/usr/bin/python3
+# above line tells unix what interpreter to use (since have both 2 and 3)
+
 import anki_vector as av 
 import numpy as np
+import math
 import cv2
 from anki_vector.util import degrees
 
@@ -74,15 +78,22 @@ def main():
         h_list.sort() # smallest to largest
 
         h_len = 0.5*(h_list[3] + h_list[2]) - 0.5*(h_list[1] + h_list[0])
-        h_frame, _, _ = frame.shape
+        h_frame, w_frame, _ = frame.shape 
 
-        coef = 1
-        d_from_cube = coef*abs(h_frame - h_len)
-        print(d_from_cube)
+        raw_dist = abs(h_frame - h_len)
+
+        if raw_dist < 310:
+            d_from_cube = 20 - math.sqrt((310-raw_dist)/0.4)
+        else:
+            d_from_cube = 20  # maybe something else here TODO
+
+        centre_dist = w_frame/2 - w_sum/4
+        # print(f"raw_dist = {raw_dist}")
+        # print(f"d_from_cube = {d_from_cube}")
+        return d_from_cube, centre_dist
+
 
         
-
-
     ANKI_SERIAL = '00804458'
     ANKI_BEHAVIOR = av.connection.ControlPriorityLevel.OVERRIDE_BEHAVIORS_PRIORITY
     cube_img = cv2.imread("block_pattern.jpg", cv2.IMREAD_GRAYSCALE)
@@ -95,6 +106,9 @@ def main():
     index_params = dict(algorithm=0, trees=5)
     search_params = dict()  # empty dictionary ?
     flann = cv2.FlannBasedMatcher(index_params, search_params)
+
+    # other
+    SET_POINT = 10  # desired distance from cube, cm
 
     with av.Robot(serial=ANKI_SERIAL,
                   behavior_control_level=ANKI_BEHAVIOR) as robot:
@@ -117,7 +131,23 @@ def main():
 
             pos = findCube(frame_cv2)
             if pos is not None:
-                calculateDistance(pos, frame_cv2)
+                d, c_error = calculateDistance(pos, frame_cv2)
+                d_error = d - SET_POINT
+
+            else:
+                # if it doesn't see the cube, do nothing
+                # TODO maybe change this to look around?
+                d_error = 0
+                c_error = 0
+            
+            # move robot!!
+            # if its different than 10cm away, move forward or backward
+            # and if off centre, turn
+            l_w_speed = d_error*10 - c_error/7
+            r_w_speed = d_error*10 + c_error/7
+            robot.motors.set_wheel_motors(l_w_speed, r_w_speed)
+            print(r_w_speed)
+
 
 
 if __name__ == "__main__":

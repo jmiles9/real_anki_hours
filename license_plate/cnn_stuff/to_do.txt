@@ -1,0 +1,47 @@
+Wednesday
+math exam >:(
+
+remove copies of images
+view augmented images
+
+To Do:
+    - figure out how to switch to using just conv.fit()
+        since fit_generator seems to be what is complicated
+            -for this, need to get data augmentation that
+                is not from imagedatagenerator?
+            - probably what is wrong is that since it is 
+                just replacing data .. ???
+            - should i be putting the images from the sim 
+                into my training set also?
+
+Tuesday
+If images are too long split in half ???
+finished (?) validation set. 
+    - figure out what is causing weird stuff with cnn
+    - integrate into sim to see if it works ok
+
+Monday
+have put code into .py files (from notebook)
+labelled all the current split plates into a .csv file 
+
+To do:
+    - take more pictures of license plates in sim 
+    - run thru the split process 
+    - label >:(
+
+
+Sunday
+i have already made a bunch of training images and labelled them. 
+now i need to make a validation set
+thoughts:
+    - take screencaps of stuff from the testing segmentation
+    - take screencaps of stuff elsewhere?
+    *** also include an option where it says "nothing" !! this might
+        be difficult. need a training option on this too
+        possibly take these from segmentation stuff as well...
+
+
+
+PROJECT IDEA:
+- make an auto-labeller: it takes images and asks u for each one what
+    it is, then puts it into the corresponding folder
